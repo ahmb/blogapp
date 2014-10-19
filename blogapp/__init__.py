@@ -1,7 +1,6 @@
 from flask import Flask
 from flask.ext.bootstrap import Bootstrap
-
-from blogapp import blog as blog_blueprint
+from .blog import blog as blog_blueprint
 from config import config
 
 
