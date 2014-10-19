@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 import os
+
 from blogapp import create_app
+
 #from flask.ext.script import Manager
 
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
