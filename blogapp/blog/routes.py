@@ -1,6 +1,6 @@
 from flask import render_template
 from . import blog
-
+from ..models import User
 
 @blog.route('/')
 def index():
@@ -9,4 +9,5 @@ def index():
 
 @blog.route('/user/<username>')
 def user(username):
-    return render_template('blog/user.html', username=username)
+    user = User.query.filter_by(username=username).first_or_404()
+    return render_template('blog/user.html', user=user)
