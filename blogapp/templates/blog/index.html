@@ -2,13 +2,5 @@
 
 
 {% block page_content %}
-    {% if current_user.is_authenticated() %}
-    <h1>Hello {{ current_user.username }}!</h1>
-    {% endif %}
-
-    {% if not current_user.is_authenticated() %}
-    <h1>Ayo you aint authenticated..! {{ current_user.username }}!</h1>
-    {% endif %}
-
 
 {% endblock %}
