@@ -1,8 +1,9 @@
-from datetime import datetime
-from werkzeug.security import generate_password_hash, check_password_hash
+from . import login_manager
 from . import db
+from datetime import datetime
+from flask.ext.sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 from flask.ext.login import UserMixin
-from . import db, login_manager
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'

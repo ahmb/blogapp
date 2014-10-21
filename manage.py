@@ -1,10 +1,7 @@
 #!/usr/bin/env python
 import os
-
-from blogapp import create_app
-
+from blogapp import db, create_app
 from flask.ext.script import Manager
-from blogapp import db
 from blogapp.models import User
 
 
@@ -29,5 +26,5 @@ def adduser(email, username, admin=False):
 
 
 if __name__ == '__main__':
-    manager.run()
-    #app.run()
+    #manager.run()
+    app.run()

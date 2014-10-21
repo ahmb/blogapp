@@ -11,4 +11,4 @@ class LoginForm(Form):
     remember_me = BooleanField('Keep me logged in')
     submit = SubmitField('Log In')
 
-wtforms.validators.DataRequired()
+
