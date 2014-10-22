@@ -26,5 +26,6 @@ def adduser(email, username, admin=False):
 
 
 if __name__ == '__main__':
+
     #manager.run()
     app.run()
