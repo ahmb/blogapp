@@ -8,5 +8,6 @@
         {% else %}
             {{ blogpost.venue }}
         {% endif %}
+        on {{ moment(blogpost.date, local=True).format('LL') }}.
     </p>
 </div>
