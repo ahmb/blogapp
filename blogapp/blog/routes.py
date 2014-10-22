@@ -51,3 +51,8 @@ def new_blogpost():
         flash('The blog post was added successfully.')
         return redirect(url_for('.index'))
     return render_template('blog/edit_blogpost.html', form=form)
+
+@blog.route('/blogpost/<int:id>')
+def getblogpost(id):
+    blogpost = BlogPost.query.get_or_404(id)
+    return render_template('blog/blogpost.html', blogpost=blogpost)
