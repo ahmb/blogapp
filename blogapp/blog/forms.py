@@ -22,3 +22,21 @@ class BlogPostForm(Form):
                             validators=[Optional(), Length(1, 128), URL()])
     date = DateField('Date')
     submit = SubmitField('Submit')
+
+    def from_model(self, blogpost):
+        self.title.data = blogpost.title
+        self.description.data = blogpost.description
+        self.slides.data = blogpost.slides
+        self.video.data = blogpost.video
+        self.venue.data = blogpost.venue
+        self.venue_url.data = blogpost.venue_url
+        self.date.data = blogpost.date
+
+    def to_model(self, blogpost):
+        blogpost.title = self.title.data
+        blogpost.description = self.description.data
+        blogpost.slides = self.slides.data
+        blogpost.video = self.video.data
+        blogpost.venue = self.venue.data
+        blogpost.venue_url = self.venue_url.data
+        blogpost.date = self.date.data

@@ -5,14 +5,14 @@
     {% include "blog/_blogpost_header.html" %}
 </div>
 <div class="talk-body">
-    {% if blogpost.video %}
+    {% if ablogpost.video %}
     <div class="talk-video">
-    {{ blogpost.video | safe }}
+    {{ ablogpost.video | safe }}
     </div>
     {% endif %}
-    {% if blogpost.slides %}
+    {% if ablogpost.slides %}
     <div class="talk-slides">
-    {{ blogpost.slides | safe }}
+    {{ ablogpost.slides | safe }}
     </div>
     {% endif %}
 </div>

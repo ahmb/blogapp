@@ -1,4 +1,4 @@
-from flask import render_template, flash, redirect, url_for
+from flask import render_template, flash, redirect, url_for, abort
 from flask.ext.login import login_required, current_user
 from .. import db
 from . import blog
@@ -46,6 +46,9 @@ def new_blogpost():
                     venue_url=form.venue_url.data,
                     date=form.date.data,
                     author=current_user)
+        #OR try the 2 line code below instead:
+        #blogpost = BlogPost(author=current_user)
+        #form.to_model(blogpost)
         db.session.add(blogpost)
         db.session.commit()
         flash('The blog post was added successfully.')
@@ -55,4 +58,28 @@ def new_blogpost():
 @blog.route('/blogpost/<int:id>')
 def getblogpost(id):
     blogpost = BlogPost.query.get_or_404(id)
-    return render_template('blog/blogpost.html', blogpost=blogpost)
+    headers = {}
+    if current_user.is_authenticated():
+        headers['X-XSS-Protection'] = '0'
+    return render_template('blog/blogpost.html', ablogpost=blogpost), 200, headers
+
+
+@blog.route('/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_blogpost(id):
+    ablogpost = BlogPost.query.get_or_404(id)
+    if not current_user.is_admin and ablogpost.author != current_user:
+        abort(403)
+    form = BlogPostForm()
+    if form.validate_on_submit():
+        form.to_model(ablogpost)
+        db.session.add(ablogpost)
+        db.session.commit()
+        flash('The blog post was updated successfully.')
+        return render_template('blog/blogpost.html', id=ablogpost.id, ablogpost = ablogpost)
+        #return redirect(url_for('.blogpost', id=ablogpost.id))
+    form.from_model(ablogpost)
+    return render_template('blog/edit_blogpost.html', form=form)
+
+
+

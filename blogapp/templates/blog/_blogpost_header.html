@@ -1,13 +1,19 @@
 <div class="talk-header">
-    <h2>{{ blogpost.title }}</h2>
-    <h3>{{ blogpost.description }}</h3>
+    {% if ablogpost.author == current_user %}
+    <a class="btn btn-primary pull-right" href="{{ url_for('blog.edit_blogpost', id=ablogpost.id) }}">Edit</a>
+    {% elif current_user.is_admin %}
+    <a class="btn btn-danger pull-right" href="{{ url_for('blog.edit_blogpost', id=ablogpost.id) }}">Edit</a>
+    {% endif %}
+    <h2><a href="{{ url_for('blog.user', username=ablogpost.author.username) }}">{{ ablogpost.title }}</a></h2>
+    <h3>{{ ablogpost.description }}</h3>
     <p>
-        Presented by <a href="{{ url_for('blog.user', username=blogpost.author.username) }}">{{ blogpost.author.username }}</a> at
-        {% if blogpost.venue_url %}
-            <a href="{{ blogpost.venue_url }}">{{ blogpost.venue }}</a>
+        Presented by <a href="{{ url_for('blog.user', username=ablogpost.author.username) }}">{{ ablogpost.author.username }}</a> at
+        {% if ablogpost.venue_url %}
+            <a href="{{ ablogpost.venue_url }}">{{ ablogpost.venue }}</a>
         {% else %}
-            {{ blogpost.venue }}
+            {{ ablogpost.venue }}
         {% endif %}
-        on {{ moment(blogpost.date, local=True).format('LL') }}.
+        on {{ moment(ablogpost.date, local=True).format('LL') }}.
     </p>
 </div>
+
