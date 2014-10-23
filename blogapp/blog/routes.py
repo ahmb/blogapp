@@ -82,7 +82,7 @@ def getblogpost(id):
         else:
             flash('Your comment will be published after it is reviewed by '
                   'the presenter.')
-        return redirect(url_for('.blogpost', id=blogpost.id) + '#top')
+        return redirect(url_for('blog.getblogpost', id=blogpost.id) + '#top')
     comments = blogpost.comments.order_by(Comment.timestamp.asc()).all()
     headers = {}
     if current_user.is_authenticated():
@@ -103,7 +103,7 @@ def edit_blogpost(id):
         db.session.add(ablogpost)
         db.session.commit()
         flash('The blog post was updated successfully.')
-        return render_template('blog/blogpost.html', id=ablogpost.id, ablogpost = ablogpost)
+        return render_template('blog/blogpost.html', id=ablogpost.id, ablogpost = ablogpost, form=form)
         #return redirect(url_for('.blogpost', id=ablogpost.id))
     form.from_model(ablogpost)
     return render_template('blog/edit_blogpost.html', form=form)

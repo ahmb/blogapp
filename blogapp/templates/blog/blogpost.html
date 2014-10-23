@@ -20,7 +20,7 @@
 
 {% if comments %}
 <h3 id="comments">Comments</h3>
-{% include "talks/_comments.html" %}
+{% include "blog/_comments.html" %}
 {% endif %}
 <h3 id="comment-form">Write a comment</h3>
 {{ wtf.quick_form(form, action='#comment-form') }}
@@ -28,12 +28,11 @@
 
 {% block scripts %}
 {{ super() }}
-{{ pagedown.include_pagedown() }}
 <script src="http://cdnjs.cloudflare.com/ajax/libs/autosize.js/1.18.1/jquery.autosize.min.js"></script>
+{{ pagedown.include_pagedown() }}
 <script>
     $(document).ready(function() {
         $('#flask-pagedown-body').autosize();
     });
 </script>
-
 {% endblock %}
