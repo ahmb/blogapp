@@ -2,8 +2,8 @@ from flask import render_template, flash, redirect, url_for, abort
 from flask.ext.login import login_required, current_user
 from .. import db
 from . import blog
-from ..models import User, BlogPost
-from .forms import ProfileForm, BlogPostForm
+from ..models import User, BlogPost, Comment
+from .forms import ProfileForm, BlogPostForm, CommentForm, PresenterCommentForm
 
 @blog.route('/')
 def index():
@@ -55,13 +55,40 @@ def new_blogpost():
         return redirect(url_for('.index'))
     return render_template('blog/edit_blogpost.html', form=form)
 
-@blog.route('/blogpost/<int:id>')
+@blog.route('/blogpost/<int:id>', methods=['GET', 'POST'])
 def getblogpost(id):
     blogpost = BlogPost.query.get_or_404(id)
+    comment = None
+    if current_user.is_authenticated():
+        form = PresenterCommentForm()
+        if form.validate_on_submit():
+            comment = Comment(body=form.body.data,
+                              blogpost=blogpost,
+                              author=current_user,
+                              notify=False, approved=True)
+    else:
+        form = CommentForm()
+        if form.validate_on_submit():
+            comment = Comment(body=form.body.data,
+                              blogpost=blogpost,
+                              author_name=form.name.data,
+                              author_email=form.email.data,
+                              notify=form.notify.data, approved=False)
+    if comment:
+        db.session.add(comment)
+        db.session.commit()
+        if comment.approved:
+            flash('Your comment has been published.')
+        else:
+            flash('Your comment will be published after it is reviewed by '
+                  'the presenter.')
+        return redirect(url_for('.blogpost', id=blogpost.id) + '#top')
+    comments = blogpost.comments.order_by(Comment.timestamp.asc()).all()
     headers = {}
     if current_user.is_authenticated():
         headers['X-XSS-Protection'] = '0'
-    return render_template('blog/blogpost.html', ablogpost=blogpost), 200, headers
+    return render_template('blog/blogpost.html', ablogpost=blogpost, form=form,
+                           comments=comments), 200, headers
 
 
 @blog.route('/edit/<int:id>', methods=['GET', 'POST'])
