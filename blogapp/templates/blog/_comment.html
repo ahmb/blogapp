@@ -5,7 +5,7 @@
     {% else %}
         <span class="label label-default">#{{ index }}</span>
         <b>{{ comment.author_name }}</b>
-        {% if current_user.is_authenticated() and (blogpost.author == current_user or current_user.is_admin) %}
+        {% if current_user.is_authenticated() and (ablogpost.author == current_user or current_user.is_admin) %}
         (<a href="mailto:{{ comment.author_email }}">{{ comment.author_email }}</a>)
         {% endif %}
     {% endif %}
