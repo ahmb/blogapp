@@ -3,7 +3,7 @@
 
 {% block page_content %}
 <div class="page-header">
-    {% include "blog/_blogpost_header.html" %}
+{% include "blog/_blogpost_header.html" %}
 </div>
 <div class="talk-body">
     {% if ablogpost.video %}
@@ -35,4 +35,5 @@
         $('#flask-pagedown-body').autosize();
     });
 </script>
+{% include "_api_client.html" %}
 {% endblock %}

@@ -16,6 +16,8 @@ def user(username):
     blogpost_list = user.blogpost.order_by(BlogPost.date.desc()).all()
     return render_template('blog/user.html', user=user, blogposts=blogpost_list)
 
+
+
 @blog.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
@@ -83,7 +85,12 @@ def getblogpost(id):
             flash('Your comment will be published after it is reviewed by '
                   'the presenter.')
         return redirect(url_for('blog.getblogpost', id=blogpost.id) + '#top')
-    comments = blogpost.comments.order_by(Comment.timestamp.asc()).all()
+    if blogpost.author == current_user or \
+            (current_user.is_authenticated() and current_user.is_admin):
+        comments_query = blogpost.comments
+    else:
+        comments_query = blogpost.approved_comments()
+    comments = comments_query.order_by(Comment.timestamp.asc()).all()
     headers = {}
     if current_user.is_authenticated():
         headers['X-XSS-Protection'] = '0'
@@ -108,5 +115,18 @@ def edit_blogpost(id):
     form.from_model(ablogpost)
     return render_template('blog/edit_blogpost.html', form=form)
 
+@blog.route('/moderate')
+@login_required
+def moderate():
+    comments = current_user.for_moderation().order_by(Comment.timestamp.asc())
+    return render_template('blog/moderate.html', comments=comments)
 
+
+@blog.route('/moderate-admin')
+@login_required
+def moderate_admin():
+    if not current_user.is_admin:
+        abort(403)
+    comments = Comment.for_moderation().order_by(Comment.timestamp.asc())
+    return render_template('blog/moderate.html', comments=comments)
 

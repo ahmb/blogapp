@@ -7,7 +7,7 @@
     <h2><a href="{{ url_for('blog.getblogpost', id=ablogpost.id) }}">{{ ablogpost.title }}</a></h2>
     <h3>{{ ablogpost.description }}</h3>
     <div class="pull-right"><a href="{{ url_for('blog.getblogpost', id=ablogpost.id) }}#comments">
-        <span class="label label-default">Comments: {{ ablogpost.comments.count() }}</span></a>
+        <span class="label label-default">Comments: {{ ablogpost.approved_comments(count=True) }}</span></a>
     </div>
     <p>
         Presented by <a href="{{ url_for('blog.user', username=ablogpost.author.username) }}">{{ ablogpost.author.username }}</a> at

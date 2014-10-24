@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block page_content %}
+<h2>Comment moderation</h2>
+<ul class="comment-list">
+{% for comment in comments %}
+    {% set ablogpost = comment.blogpost %}
+    <li class="comment">
+        <p>In <a href="{{ url_for('blog.getblogpost', id=ablogpost.id) }}">{{ ablogpost.title }}</a></p>
+        {% include "blog/_comment.html" %}
+    </li>
+{% endfor %}
+</ul>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+{% include "_api_client.html" %}
+{% endblock %}
