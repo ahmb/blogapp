@@ -1,4 +1,5 @@
-from flask import render_template, flash, redirect, url_for, abort
+from flask import render_template, flash, redirect, url_for, abort,\
+    request, current_app
 from flask.ext.login import login_required, current_user
 from .. import db
 from . import blog
@@ -7,14 +8,26 @@ from .forms import ProfileForm, BlogPostForm, CommentForm, PresenterCommentForm
 
 @blog.route('/')
 def index():
-    blogpost_list = BlogPost.query.order_by(BlogPost.date.desc()).all()
-    return render_template('blog/index.html', blogposts=blogpost_list)
+    page = request.args.get('page', 1, type=int)
+    pagination = BlogPost.query.order_by(BlogPost.date.desc()).paginate(
+        page, per_page=current_app.config['TALKS_PER_PAGE'],
+        error_out=False)
+    blogpost_list = pagination.items
+    return render_template('blog/index.html', blogposts=blogpost_list,
+                           pagination=pagination)
 
 @blog.route('/user/<username>')
 def user(username):
     user = User.query.filter_by(username=username).first_or_404()
-    blogpost_list = user.blogpost.order_by(BlogPost.date.desc()).all()
-    return render_template('blog/user.html', user=user, blogposts=blogpost_list)
+    page = request.args.get('page', 1, type=int)
+    pagination = user.blogpost.order_by(BlogPost.date.desc()).paginate(
+        page, per_page=current_app.config['TALKS_PER_PAGE'],
+        error_out=False)
+    p = user
+
+    blogpost_list = pagination.items
+    return render_template('blog/user.html', user=user, blogposts=blogpost_list,
+                           pagination=pagination)
 
 
 
@@ -90,12 +103,20 @@ def getblogpost(id):
         comments_query = blogpost.comments
     else:
         comments_query = blogpost.approved_comments()
-    comments = comments_query.order_by(Comment.timestamp.asc()).all()
+
+    page = request.args.get('page', 1, type=int)
+    pagination = comments_query.order_by(Comment.timestamp.asc()).paginate(
+        page, per_page=current_app.config['COMMENTS_PER_PAGE'],
+        error_out=False)
+
+    comments = pagination.items
     headers = {}
+
     if current_user.is_authenticated():
         headers['X-XSS-Protection'] = '0'
     return render_template('blog/blogpost.html', ablogpost=blogpost, form=form,
-                           comments=comments), 200, headers
+                           comments=comments, pagination=pagination),\
+           200, headers
 
 
 @blog.route('/edit/<int:id>', methods=['GET', 'POST'])

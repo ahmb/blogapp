@@ -5,10 +5,11 @@
 {% block head %}
 {{ super() }}
 <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='navbarstyles.css') }}">
 {% endblock %}
 
 {% block navbar %}
-<div class="navbar navbar-default" role="navigation">
+<div class="navbar navbar-custom" role="navigation">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">

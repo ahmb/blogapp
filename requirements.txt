@@ -16,4 +16,7 @@ Markdown
 bleach
 html5lib
 six
+blinker
+Flask-Mail
+
 

@@ -8,6 +8,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
 from flask import request, current_app
 from flask.ext.login import UserMixin
+from sqlalchemy.ext.declarative import declarative_base
+
+
+Base = declarative_base()
 
 
 class User(UserMixin, db.Model):
@@ -27,12 +31,16 @@ class User(UserMixin, db.Model):
     blogpost = db.relationship('BlogPost', lazy='dynamic', backref='author')
     comments = db.relationship('Comment', lazy='dynamic', backref='author')
 
+    def __repr__(self):
+        return '<User %r>' % (self.username)
+
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
         if self.email is not None and self.avatar_hash is None:
             self.avatar_hash = hashlib.md5(
                 self.email.encode('utf-8')).hexdigest()
 
+    #property getter
     @property
     def password(self):
         raise AttributeError('password is not a readable attribute')
@@ -87,7 +95,7 @@ class BlogPost(db.Model):
     title = db.Column(db.String(128), nullable=False)
     description = db.Column(db.Text)
     slides = db.Column(db.Text())
-    video = db.Column(db.Text())
+    video = db.Column(db.Text ())
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     venue = db.Column(db.String(128))
     venue_url = db.Column(db.String(128))
