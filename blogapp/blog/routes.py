@@ -23,7 +23,7 @@ def user(username):
     pagination = user.blogpost.order_by(BlogPost.date.desc()).paginate(
         page, per_page=current_app.config['TALKS_PER_PAGE'],
         error_out=False)
-    p = user
+
 
     blogpost_list = pagination.items
     return render_template('blog/user.html', user=user, blogposts=blogpost_list,
