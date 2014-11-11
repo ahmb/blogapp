@@ -39,9 +39,9 @@ MAIL_SERVER = 'smtp.googlemail.com'
 MAIL_PORT = 465
 MAIL_USE_TLS = False
 MAIL_USE_SSL = True
-MAIL_USERNAME = 'raufguy@Gmail.com'
+MAIL_USERNAME = 'pass'
 #MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
-MAIL_PASSWORD = 'dell0911XYZ$'
+MAIL_PASSWORD = 'pass'
 
 # administrator list
 ADMINS = ['raufguy@gmail.com']
