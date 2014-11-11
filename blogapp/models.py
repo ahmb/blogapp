@@ -27,6 +27,7 @@ class User(UserMixin, db.Model):
     location = db.Column(db.String(64))
     bio = db.Column(db.Text())
     member_since = db.Column(db.DateTime(), default=datetime.utcnow)
+    last_seen = db.Column(db.DateTime)
     avatar_hash = db.Column(db.String(32))
     blogpost = db.relationship('BlogPost', lazy='dynamic', backref='author')
     comments = db.relationship('Comment', lazy='dynamic', backref='author')

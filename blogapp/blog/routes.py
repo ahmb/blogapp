@@ -1,10 +1,21 @@
 from flask import render_template, flash, redirect, url_for, abort,\
-    request, current_app
-from flask.ext.login import login_required, current_user
+    request, current_app, g
 from .. import db
+from flask.ext.login import login_required, current_user
 from . import blog
 from ..models import User, BlogPost, Comment
 from .forms import ProfileForm, BlogPostForm, CommentForm, PresenterCommentForm
+from datetime import datetime
+
+
+
+@blog.before_request
+def before_request():
+    g.user = current_user
+    if g.user.is_authenticated():
+        g.user.last_seen = datetime.utcnow()
+        db.session.add(g.user)
+        db.session.commit()
 
 @blog.route('/')
 def index():

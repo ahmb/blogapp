@@ -10,6 +10,7 @@
     <p>
         {% if user.name %}{{ user.name }}<br>{% endif %}
         {% if user.location %}<a href="http://maps.google.com?q={{ user.location }}">{{ user.location }}</a><br>{% endif %}
+        {% if user.last_seen %}<p><i>Last seen on: {{ user.last_seen }}</i></p>{% endif %}
     </p>
     {% if user.bio %}<p>{{ user.bio }}</p>{% endif %}
 </div>

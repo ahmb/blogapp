@@ -10,7 +10,7 @@
         <span class="label label-default">Comments: {{ ablogpost.approved_comments(count=True) }}</span></a>
     </div>
     <p>
-        Presented by <a href="{{ url_for('blog.user', username=ablogpost.author.username) }}">{{ ablogpost.author.username }}</a> at
+        Written by <a href="{{ url_for('blog.user', username=ablogpost.author.username) }}"><img src="{{ ablogpost.author.gravatar(12) }}">{{ ablogpost.author.username }}</a> at
         {% if ablogpost.venue_url %}
             <a href="{{ ablogpost.venue_url }}">{{ ablogpost.venue }}</a>
         {% else %}
