@@ -30,8 +30,8 @@
       <column name="avatar_hash" sqlType="VARCHAR(32)" precision="2000000000" scale="10" nullable="true" jdbcType="12"/>
       <primary-key columns="id"/>
       <exported-key name="#FAKE_blogposts_1" table="blogposts" schema="" catalog="" columns="user_id"/>
-      <index name="ix_users_username" unique="true" columns="username"/>
       <index name="ix_users_email" unique="true" columns="email"/>
+      <index name="ix_users_username" unique="true" columns="username"/>
     </table>
   </data-source>
 </component>

@@ -12,14 +12,14 @@ class DevelopmentConfig(Config):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 't0p s3cr3t'
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
-    SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
+    #SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
 
 class DevelopmentConfigTwo(Config):
     DEBUG = True
     SECRET_KEY = os.environ.get('SECRET_KEY') or 't0p s3cr3t'
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'data-dev2.sqlite')
-    SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
+    #SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
 
 
 class TestingConfig(Config):
@@ -27,12 +27,12 @@ class TestingConfig(Config):
     SECRET_KEY = 'secret'
     SQLALCHEMY_DATABASE_URI = os.environ.get('TEST_DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'data-test.sqlite')
-    SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
+    #SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
 
 class ProductionConfig(Config):
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'data.sqlite')
-    SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
+    #SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
 
 config = {
     'development': DevelopmentConfig,
