@@ -41,6 +41,43 @@ def user(username):
                            pagination=pagination)
 
 
+@blog.route('/follow/<username>')
+@login_required
+def follow(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('User %s not found.' % username)
+        return redirect(url_for('blog.index'))
+    if user == g.user:
+        flash('You can\'t follow yourself!')
+        return redirect(url_for('blog.user', username=username))
+    u = g.user.follow(user)
+    if u is None:
+        flash('Cannot follow ' + username + '.')
+        return redirect(url_for('blog.user', username=username))
+    db.session.add(u)
+    db.session.commit()
+    flash('You are now following ' + username + '!')
+    return redirect(url_for('blog.user', username=username))
+
+@blog.route('/unfollow/<username>')
+@login_required
+def unfollow(username):
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        flash('User %s not found.' % username)
+        return redirect(url_for('blog.index'))
+    if user == g.user:
+        flash('You can\'t unfollow yourself!')
+        return redirect(url_for('blog.user', username=username))
+    u = g.user.unfollow(user)
+    if u is None:
+        flash('Cannot unfollow ' + username + '.')
+        return redirect(url_for('blog.user', username=username))
+    db.session.add(u)
+    db.session.commit()
+    flash('You have stopped following ' + username + '.')
+    return redirect(url_for('blog.user', username=username))
 
 @blog.route('/profile', methods=['GET', 'POST'])
 @login_required

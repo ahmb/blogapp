@@ -13,6 +13,10 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
+followers = db.Table('followers',
+    db.Column('follower_id', db.Integer, db.ForeignKey('users.id')),
+    db.Column('followed_id', db.Integer, db.ForeignKey('users.id'))
+)
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -31,6 +35,21 @@ class User(UserMixin, db.Model):
     avatar_hash = db.Column(db.String(32))
     blogpost = db.relationship('BlogPost', lazy='dynamic', backref='author')
     comments = db.relationship('Comment', lazy='dynamic', backref='author')
+    followed = db.relationship('User',
+                               secondary=followers,
+                               primaryjoin=(followers.c.follower_id == id),
+                               secondaryjoin=(followers.c.followed_id == id),
+                               backref=db.backref('followers', lazy='dynamic'),
+                               lazy='dynamic')
+    '''
+    comment for ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    'User' is the right side entity that is in this relationship (the left side entity is the parent class). Since we are defining a self-referential relationship we use the same class on both sides.
+    secondary indicates the association table that is used for this relationship.
+    primaryjoin indicates the condition that links the left side entity (the follower user) with the association table. Note that because the followers table is not a model there is a slightly odd syntax required to get to the field name.
+    secondaryjoin indicates the condition that links the right side entity (the followed user) with the association table.
+    backref defines how this relationship will be accessed from the right side entity. We said that for a given user the query named followed returns all the right side users that have the target user on the left side. The back reference will be called followers and will return all the left side users that are linked to the target user in the right side. The additional lazy argument indicates the execution mode for this query. A mode of dynamic sets up the query to not run until specifically requested. This is useful for performance reasons, and also because we will be able to take this query and modify it before it executes. More about this later.
+    lazy is similar to the parameter of the same name in the backref, but this one applies to the regular query instead of the back reference.
+    '''
 
     def __repr__(self):
         return '<User %r>' % (self.username)
@@ -85,6 +104,27 @@ class User(UserMixin, db.Model):
             return User.query.get(id)
         return None
 
+    def follow(self, user):
+        if not self.is_following(user):
+            self.followed.append(user)
+            return self
+
+    def unfollow(self, user):
+        if self.is_following(user):
+            self.followed.remove(user)
+            return self
+
+    def is_following(self, user):
+        return self.followed.filter(followers.c.followed_id == user.id).count() > 0
+
+    def followed_posts(self):
+        return BlogPost.query.join(followers, (followers.c.followed_id == BlogPost.user_id)).filter(followers.c.follower_id == self.id).order_by(BlogPost.timestamp.desc())
+
+    def follows_oneself(self):
+        if self.is_following(self):
+            pass
+        else:
+           self.follow(self)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -135,3 +175,5 @@ class Comment(db.Model):
         return Comment.query.filter(Comment.approved == False)
 
 db.event.listen(Comment.body, 'set', Comment.on_changed_body)
+
+

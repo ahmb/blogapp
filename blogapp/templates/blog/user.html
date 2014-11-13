@@ -3,9 +3,14 @@
 {% block page_content %}
 <div class="page-header user-profile">
     <div class="user-avatar"><img src="{{ user.gravatar(128) }}"></div>
-    {% if current_user == user %}
-    <a class="btn btn-default pull-right" href="{{ url_for('blog.profile') }}">Edit Profile</a>
-    {% endif %}
+    <p>{{ user.followers.count() }} followers |
+              {% if user.id == g.user.id %}
+                  <a class="btn btn-default pull-right" href="{{ url_for('blog.profile') }}">Edit your profile</a>
+              {% elif not g.user.is_following(user) %}
+                  <a class="btn btn-info pull-right" href="{{ url_for('blog.follow', username=user.username) }}">Follow</a>
+              {% else %}
+                  <a class="btn btn-info pull-right" href="{{ url_for('blog.unfollow', username=user.username) }}">Unfollow</a>
+              {% endif %}
     <h1>{{ user.username }}</h1>
     <p>
         {% if user.name %}{{ user.name }}<br>{% endif %}
