@@ -2,11 +2,10 @@
 import os
 from blogapp import db, create_app
 from flask.ext.script import Manager
-from blogapp.models import User
 from flask.ext.migrate import Migrate, MigrateCommand
 from config import config
 from config import MAIL_PORT, MAIL_PASSWORD, MAIL_SERVER, MAIL_USE_SSL, MAIL_USE_TLS, MAIL_USERNAME, ADMINS
-
+from blogapp.models import BlogPost
 
 #Create the app from the configuration outlined in config.py; the default which is being used is developmental
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
@@ -84,10 +83,23 @@ if not app.debug:
 migrate = Migrate(app, db)
 
 manager = Manager(app)
+import sys
+
+#Enable Whoosh-Alchemy if python version is lower than 3
+
+if sys.version_info >= (3, 0):
+    enable_search = False
+else:
+    enable_search = True
+
+if enable_search is True:
+    import flask.ext.whooshalchemy as whooshalchemy
+    whooshalchemy.whoosh_index(app, BlogPost)
 
 @manager.command
 def adduser(email, username, admin=False):
     """Register a new user."""
+    from blogapp.models import User
     from getpass import getpass
     password = getpass()
     password2 = getpass(prompt='Confirm: ')

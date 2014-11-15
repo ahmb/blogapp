@@ -1,9 +1,12 @@
 from flask import render_template, current_app, request, redirect, url_for, \
-    flash
+    flash, g
 from flask.ext.login import login_user, logout_user, login_required
 from ..models import User
 from . import auth
 from .forms import LoginForm, RegistrationForm
+from .. import db
+from .forms import SearchForm
+from flask.ext.login import login_required, current_user
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
@@ -36,3 +39,8 @@ def logout():
 @auth.route('/signup', methods=['GET','POST'])
 def register():
     form = RegistrationForm()
+
+@auth.before_request
+def before_request():
+    g.user = current_user
+    g.search_form = SearchForm()

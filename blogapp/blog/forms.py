@@ -55,3 +55,6 @@ class CommentForm(Form):
     body = PageDownField('Comment', validators=[Required()])
     notify = BooleanField('Notify when new comments are posted', default=True)
     submit = SubmitField('Submit')
+
+class SearchForm(Form):
+    search = StringField('search', validators=[Required()])
