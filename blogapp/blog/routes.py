@@ -3,19 +3,32 @@ from flask import render_template, flash, redirect, url_for, abort,\
 from .. import db
 from flask.ext.login import login_required, current_user
 from . import blog
-from ..models import User, BlogPost, Comment
-from .forms import ProfileForm, BlogPostForm, CommentForm, PresenterCommentForm
+from blogapp.models import User, BlogPost, Comment
+from .forms import ProfileForm, BlogPostForm, CommentForm, PresenterCommentForm, SearchForm
 from datetime import datetime
-
 
 
 @blog.before_request
 def before_request():
     g.user = current_user
+    g.search_form = SearchForm()
     if g.user.is_authenticated():
         g.user.last_seen = datetime.utcnow()
         db.session.add(g.user)
         db.session.commit()
+
+@blog.route('/search', methods=['POST'])
+def search():
+    if not g.search_form.validate_on_submit():
+        return redirect(url_for('blog.index'))
+    return redirect(url_for('blog.search_results', query=g.search_form.search.data))
+
+@blog.route('/search_results/<query>')
+def search_results(query):
+    results = BlogPost.query.whoosh_search(query, current_app.config['MAX_SEARCH_RESULTS']).all()
+    return render_template('blog/search_results.html',
+                           query=query,
+                           blogposts=results)
 
 @blog.route('/')
 def index():

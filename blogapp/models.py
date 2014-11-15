@@ -11,7 +11,12 @@ from flask.ext.login import UserMixin
 from sqlalchemy.ext.declarative import declarative_base
 
 
+
 Base = declarative_base()
+
+
+
+
 
 followers = db.Table('followers',
     db.Column('follower_id', db.Integer, db.ForeignKey('users.id')),
@@ -132,6 +137,7 @@ def load_user(user_id):
 
 class BlogPost(db.Model):
     __tablename__ = 'blogposts'
+    __searchable__ = ['title', 'description']
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(128), nullable=False)
     description = db.Column(db.Text)
@@ -142,10 +148,15 @@ class BlogPost(db.Model):
     venue_url = db.Column(db.String(128))
     date = db.Column(db.DateTime())
     comments = db.relationship('Comment', lazy='dynamic', backref='blogpost')
+
+    def __repr__(self):
+        return '<Blog Post content is: %r>' % (self.description)
+
     def approved_comments(self, count=False):
         if count is not False:
             return self.comments.filter_by(approved=True).count()
         return self.comments.filter_by(approved=True)
+
 
 
 class Comment(db.Model):

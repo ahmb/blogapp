@@ -29,3 +29,7 @@ class RegistrationForm(Form):
             self.username.errors.append('This nickname is already in use. Please choose another one.')
             return False
         return True
+
+
+class SearchForm(Form):
+    search = StringField('search', validators=[Required()])

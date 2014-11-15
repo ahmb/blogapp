@@ -6,6 +6,7 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY')
     TALKS_PER_PAGE = 50
     COMMENTS_PER_PAGE = 100
+    MAX_SEARCH_RESULTS = 50
 
 
 class DevelopmentConfig(Config):
@@ -13,6 +14,7 @@ class DevelopmentConfig(Config):
     SECRET_KEY = os.environ.get('SECRET_KEY') or 't0p s3cr3t'
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
         'sqlite:///' + os.path.join(basedir, 'data-dev.sqlite')
+    WHOOSH_BASE = os.path.join(basedir, 'search.db')
     #SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'db_repository')
 
 class TestingConfig(Config):
