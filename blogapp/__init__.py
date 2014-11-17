@@ -8,30 +8,40 @@ from config import config
 from flask.ext.mail import Mail
 
 
-bootstrap = Bootstrap()
-mail = Mail()
-moment = Moment()
-pagedown = PageDown()
 db = SQLAlchemy()
+
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login'
 
+mail = Mail()
+
+moment = Moment()
+
+pagedown = PageDown()
+
+bootstrap = Bootstrap()
 
 def create_app(config_name):
     app = Flask(__name__)
     app.config.from_object(config[config_name])
-    bootstrap.init_app(app)
 
     db.init_app(app)
+
+    mail.init_app(app)
+
+    bootstrap.init_app(app)
+
+    moment.init_app(app)
+
+    pagedown.init_app(app)
+
+    login_manager.init_app(app)
+
     #with app.app_context():
         # Extensions like Flask-SQLAlchemy now know what the "current" app
         # is while within this block. Therefore, you can now run........
         #db.drop_all()
     #    db.create_all()
-    moment.init_app(app)
-    pagedown.init_app(app)
-    login_manager.init_app(app)
-    mail.init_app(app)
 
     from .blog import blog as blog_blueprint
     app.register_blueprint(blog_blueprint)

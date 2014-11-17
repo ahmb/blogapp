@@ -3,31 +3,30 @@ import os
 from blogapp import db, create_app
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
-from config import config
-from config import MAIL_PORT, MAIL_PASSWORD, MAIL_SERVER, MAIL_USE_SSL, MAIL_USE_TLS, MAIL_USERNAME, ADMINS
 from blogapp.models import BlogPost
+from config import config
 
 #Create the app from the configuration outlined in config.py; the default which is being used is developmental
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 
 #SET UP LOGGING HERE
+
+import logging
+from logging.handlers import RotatingFileHandler
+file_handler = RotatingFileHandler('tmp/internetmagic.log', 'a', 1 * 1024 * 1024, 10)
+file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
+app.logger.setLevel(logging.INFO)
+file_handler.setLevel(logging.INFO)
+app.logger.addHandler(file_handler)
+app.logger.info('microblog startup')
+
 if not app.debug:
     import logging
-    from logging.handlers import RotatingFileHandler
-    file_handler = RotatingFileHandler('tmp/microblog.log', 'a', 1 * 1024 * 1024, 10)
-    file_handler.setFormatter(logging.Formatter('%(asctime)s %(levelname)s: %(message)s [in %(pathname)s:%(lineno)d]'))
-    app.logger.setLevel(logging.INFO)
-    file_handler.setLevel(logging.INFO)
-    app.logger.addHandler(file_handler)
-    app.logger.info('microblog startup')
-
-
-    import logging
     import logging.handlers
-
     credentials = None
-    if MAIL_USERNAME or MAIL_PASSWORD:
-        credentials = (MAIL_USERNAME, MAIL_PASSWORD)
+
+    if app.config['MAIL_USERNAME'] or app.config['MAIL_PASSWORD']:
+        credentials = (app.config['MAIL_USERNAME'], app.config['MAIL_PASSWORD'])
 
     #To use gmail you have to extend logging.handlers.SMTPHandler class and override SMTPHandler.emit() method.
     class TlsSMTPHandler(logging.handlers.SMTPHandler):
@@ -45,10 +44,10 @@ if not app.debug:
                 except ImportError:
                     #formatdate = self.date_time
                     pass
-                port = MAIL_PORT
+                port = app.config['MAIL_PORT']
                 if not port:
                     port = smtplib.SMTP_PORT
-                smtp = smtplib.SMTP(MAIL_SERVER, MAIL_PORT)
+                smtp = smtplib.SMTP(app.config['MAIL_SERVER'], app.config['MAIL_PORT'])
 
                 msg = self.format(record)
                 msg = "From: %s\r\nTo: %s\r\nSubject: %s\r\nDate: %s\r\n\r\n%s" % (
@@ -71,7 +70,7 @@ if not app.debug:
     logger = logging.getLogger()
     #    def __init__(self, mailhost, fromaddr, toaddrs, subject, \
     #            credentials=None, secure=None):
-    gmail_handler = TlsSMTPHandler((MAIL_SERVER, MAIL_PORT), 'no-reply@' + MAIL_SERVER, ADMINS, 'Microblog failure', \
+    gmail_handler = TlsSMTPHandler((app.config['MAIL_SERVER'], app.config['MAIL_PORT']), 'no-reply@' + app.config['MAIL_SERVER'], app.config['ADMINS'], 'Internet Magic blog failure', \
                                    credentials)
 
     gmail_handler.setLevel(logging.ERROR)
@@ -117,5 +116,5 @@ manager.add_command('db', MigrateCommand)
 
 if __name__ == '__main__':
 
-    #manager.run()
-    app.run()
+    manager.run()
+    #app.run()

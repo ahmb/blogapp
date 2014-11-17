@@ -6,7 +6,7 @@ from . import blog
 from blogapp.models import User, BlogPost, Comment
 from .forms import ProfileForm, BlogPostForm, CommentForm, PresenterCommentForm, SearchForm
 from datetime import datetime
-
+from blogapp.emails import follower_notification
 
 @blog.before_request
 def before_request():
@@ -71,6 +71,10 @@ def follow(username):
     db.session.add(u)
     db.session.commit()
     flash('You are now following ' + username + '!')
+    #Everytime the below function is used to send an email via gmail SMTP servers , the following error is recieved:
+    follower_notification(user, g.user)
+    '''socket.error
+    error: [Errno 10061] No connection could be made because the target machine actively refused it'''
     return redirect(url_for('blog.user', username=username))
 
 @blog.route('/unfollow/<username>')
