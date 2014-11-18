@@ -57,7 +57,7 @@ class User(UserMixin, db.Model):
     '''
 
     def __repr__(self):
-        return '<User %r>' % (self.username)
+        return '<User %r>' % self.username
 
     def __init__(self, **kwargs):
         super(User, self).__init__(**kwargs)
@@ -150,7 +150,7 @@ class BlogPost(db.Model):
     comments = db.relationship('Comment', lazy='dynamic', backref='blogpost')
 
     def __repr__(self):
-        return '<Blog Post content is: %r>' % (self.description)
+        return '<Blog Post content is: %r>' % self.description
 
     def approved_comments(self, count=False):
         if count is not False:

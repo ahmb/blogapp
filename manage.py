@@ -4,10 +4,11 @@ from blogapp import db, create_app
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
 from blogapp.models import BlogPost
-from config import config
+from config import *
 
 #Create the app from the configuration outlined in config.py; the default which is being used is developmental
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
+
 
 #SET UP LOGGING HERE
 
@@ -116,5 +117,5 @@ manager.add_command('db', MigrateCommand)
 
 if __name__ == '__main__':
 
-    manager.run()
-    #app.run()
+    #manager.run()
+    app.run()

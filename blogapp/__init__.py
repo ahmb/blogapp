@@ -6,6 +6,7 @@ from flask.ext.moment import Moment
 from flask.ext.pagedown import PageDown
 from config import config
 from flask.ext.mail import Mail
+from config import *
 
 
 db = SQLAlchemy()
@@ -23,11 +24,15 @@ bootstrap = Bootstrap()
 
 def create_app(config_name):
     app = Flask(__name__)
-    app.config.from_object(config[config_name])
+    #app.config.from_object(config[config_name])
+    app.config.from_object(DevelopmentConfig)
+
 
     db.init_app(app)
 
-    mail.init_app(app)
+
+
+    Mail(app)
 
     bootstrap.init_app(app)
 

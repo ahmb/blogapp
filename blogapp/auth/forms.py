@@ -15,7 +15,7 @@ class RegistrationForm(Form):
     username = StringField('Username', validators=[Required()])
     about_me = StringField('About_Me', validators=[Length(min=0, max=140)])
 
-    def __init__(self, original_username, *args, **kwargs):
+    def __init__(self, original_username = None, *args, **kwargs):
         Form.__init__(self, *args, **kwargs)
         self.original_username = original_username
 
