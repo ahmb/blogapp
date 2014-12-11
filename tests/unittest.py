@@ -7,6 +7,16 @@ from blogapp import db
 from blogapp.models import User
 from manage import app
 
+
+import coverage
+COV = coverage.coverage(branch=True, include='app/*')
+COV.start
+
+#import unit tests from other tests folder files and then compile into a suite
+suite = unittest.TestLoader().discover('tests')
+unittest.TextTestRunner(verbosity=2).run(suite)
+
+
 class TestCase(unittest.TestCase):
     def setUp(self):
         app.config['TESTING'] = True
@@ -51,3 +61,6 @@ class TestCase(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+COV.stop
+COV.report

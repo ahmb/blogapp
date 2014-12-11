@@ -4,7 +4,6 @@ from flask.ext.login import login_user, logout_user, login_required
 from ..models import User
 from . import auth
 from .forms import LoginForm, RegistrationForm
-from .. import db
 from .forms import SearchForm
 from flask.ext.login import login_required, current_user
 
@@ -22,7 +21,8 @@ def login():
         if user is None or not user.verify_password(form.password.data):
 
             flash('Invalid email or password.')
-            return redirect(url_for('.login'))
+            #the **request.args is used to send the "next" page data from the client to the server so the client can be redirected there after logging the client in
+            return redirect(url_for('.login', **request.args))
 
         login_user(user, form.remember_me.data)
         return redirect(request.args.get('next') or url_for('blog.index'))

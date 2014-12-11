@@ -18,5 +18,5 @@ html5lib
 six
 blinker
 Flask-Mail
-
-
+Flask-Babel
+Coverage

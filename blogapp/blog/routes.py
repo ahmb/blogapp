@@ -7,6 +7,10 @@ from blogapp.models import User, BlogPost, Comment
 from .forms import ProfileForm, BlogPostForm, CommentForm, PresenterCommentForm, SearchForm
 from datetime import datetime
 from blogapp.emails import follower_notification
+from config import LANGUAGES
+from flask.ext.sqlalchemy import get_debug_queries
+
+
 
 @blog.before_request
 def before_request():
@@ -16,6 +20,13 @@ def before_request():
         g.user.last_seen = datetime.utcnow()
         db.session.add(g.user)
         db.session.commit()
+
+@blog.after_request
+def after_request(response):
+    for query in get_debug_queries():
+        if query.duration >= current_app.config['DATABASE_QUERY_TIMEOUT']:
+            current_app._get_current_object().logger.warning("SLOW QUERY: %s\nParameters: %s\nDuration: %fs\nContext: %s\n" % (query.statement, query.parameters, query.duration, query.context))
+    return response
 
 @blog.route('/search', methods=['POST'])
 def search():

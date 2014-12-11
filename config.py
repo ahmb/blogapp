@@ -19,6 +19,10 @@ class Config:
     #MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_PASSWORD = 'pass'
 
+    SQLALCHEMY_RECORD_QUERIES = True
+    # slow database query threshold (in seconds)
+    DATABASE_QUERY_TIMEOUT = 0.5
+
     # administrator list
     ADMINS = ['raufguy@gmail.com']
 
@@ -75,3 +79,10 @@ config = {
 # administrator list
 ADMINS = ['raufguy@gmail.com']
 
+
+# -*- coding: utf-8 -*-
+# ...
+# available languages
+LANGUAGES = {
+    'en': 'English',
+}

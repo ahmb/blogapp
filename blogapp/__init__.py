@@ -7,6 +7,7 @@ from flask.ext.pagedown import PageDown
 from config import config
 from flask.ext.mail import Mail
 from config import *
+#from flask.ext.babel import Babel
 
 
 db = SQLAlchemy()
@@ -22,6 +23,8 @@ pagedown = PageDown()
 
 bootstrap = Bootstrap()
 
+#babel = Babel()
+
 def create_app(config_name):
     app = Flask(__name__)
     #app.config.from_object(config[config_name])
@@ -30,7 +33,7 @@ def create_app(config_name):
 
     db.init_app(app)
 
-
+    #babel.init_app(app)
 
     Mail(app)
 

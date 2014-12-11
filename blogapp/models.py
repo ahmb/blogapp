@@ -109,6 +109,14 @@ class User(UserMixin, db.Model):
             return User.query.get(id)
         return None
 
+    @staticmethod
+    def register(username, password):
+        user = User(username=username)
+        user.password(password)
+        db.session.add(user)
+        db.session.commit()
+        return user
+
     def follow(self, user):
         if not self.is_following(user):
             self.followed.append(user)
@@ -130,6 +138,7 @@ class User(UserMixin, db.Model):
             pass
         else:
            self.follow(self)
+
 
 @login_manager.user_loader
 def load_user(user_id):
