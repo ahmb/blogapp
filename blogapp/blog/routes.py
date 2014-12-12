@@ -1,5 +1,5 @@
 from flask import render_template, flash, redirect, url_for, abort,\
-    request, current_app, g
+    request, current_app, g, jsonify
 from .. import db
 from flask.ext.login import login_required, current_user
 from . import blog
@@ -10,7 +10,12 @@ from blogapp.emails import follower_notification
 from config import LANGUAGES
 from flask.ext.sqlalchemy import get_debug_queries
 
-
+# authentication token route
+from ..auth import authx
+@blog.route('/get-auth-token')
+@authx.login_required
+def get_auth_token():
+    return jsonify({'token': g.user.get_api_token()})
 
 @blog.before_request
 def before_request():

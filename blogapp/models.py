@@ -6,16 +6,17 @@ import bleach
 from flask.ext.sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
-from flask import request, current_app
+from flask import request, current_app, url_for, jsonify, request, g
 from flask.ext.login import UserMixin
 from sqlalchemy.ext.declarative import declarative_base
-
-
+from datetime import datetime
+from dateutil import parser as datetime_parser
+from dateutil.tz import tzutc
+from flask.ext.httpauth import HTTPBasicAuth
+from .utils import split_url
+from exceptions import ValidationError
 
 Base = declarative_base()
-
-
-
 
 
 followers = db.Table('followers',
@@ -93,21 +94,23 @@ class User(UserMixin, db.Model):
         return Comment.query.join(BlogPost, Comment.blogpost_id == BlogPost.id).\
             filter(BlogPost.author == self).filter(Comment.approved == False)
 
-    def get_api_token(self, expiration=300):
-        s = Serializer(current_app.config['SECRET_KEY'], expiration)
-        return s.dumps({'user': self.id}).decode('utf-8')
+    def get_api_token(self, expires_in=3600):
+        s = Serializer(current_app.config['SECRET_KEY'], expires_in=expires_in)
+        return s.dumps({'id': self.id}).decode('utf-8')
 
     @staticmethod
-    def validate_api_token(token):
+    def verify_auth_token(token):
         s = Serializer(current_app.config['SECRET_KEY'])
         try:
             data = s.loads(token)
-        except:
+        except SignatureExpired:
             return None
-        id = data.get('user')
-        if id:
-            return User.query.get(id)
-        return None
+            # valid token, but expired
+        except BadSignature:
+            return None
+             # invalid token
+        user = User.query.get(data['id'])
+        return user
 
     @staticmethod
     def register(username, password):
@@ -196,4 +199,114 @@ class Comment(db.Model):
 
 db.event.listen(Comment.body, 'set', Comment.on_changed_body)
 
+class Customer(db.Model):
+    __tablename__ = 'customers'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True)
+    orders = db.relationship('Order', backref='customer', lazy='dynamic')
 
+    def get_url(self):
+        return url_for('api.get_customer', id=self.id, _external=True)
+
+    def export_data(self):
+        return {
+            'self_url': self.get_url(),
+            'name': self.name,
+            'orders_url': url_for('api.get_customer_orders', id=self.id,
+                                  _external=True)
+        }
+
+    def import_data(self, data):
+        try:
+            self.name = data['name']
+        except KeyError as e:
+            raise ValidationError('Invalid customer: missing ' + e.args[0])
+        return self
+
+
+class Product(db.Model):
+    __tablename__ = 'products'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64), index=True)
+    items = db.relationship('Item', backref='product', lazy='dynamic')
+
+    def get_url(self):
+        return url_for('api.get_product', id=self.id, _external=True)
+
+    def export_data(self):
+        return {
+            'self_url': self.get_url(),
+            'name': self.name
+        }
+
+    def import_data(self, data):
+        try:
+            self.name = data['name']
+        except KeyError as e:
+            raise ValidationError('Invalid product: missing ' + e.args[0])
+        return self
+
+
+class Order(db.Model):
+    __tablename__ = 'orders'
+    id = db.Column(db.Integer, primary_key=True)
+    customer_id = db.Column(db.Integer, db.ForeignKey('customers.id'),
+                            index=True)
+    date = db.Column(db.DateTime, default=datetime.now)
+    items = db.relationship('Item', backref='order', lazy='dynamic',
+                            cascade='all, delete-orphan')
+
+    def get_url(self):
+        return url_for('api.get_order', id=self.id, _external=True)
+
+    def export_data(self):
+        return {
+            'self_url': self.get_url(),
+            'customer_url': self.customer.get_url(),
+            'date': self.date.isoformat() + 'Z',
+            'items_url': url_for('api.get_order_items', id=self.id,
+                                 _external=True)
+        }
+
+    def import_data(self, data):
+        try:
+            self.date = datetime_parser.parse(data['date']).astimezone(
+                tzutc()).replace(tzinfo=None)
+        except KeyError as e:
+            raise ValidationError('Invalid order: missing ' + e.args[0])
+        return self
+
+
+class Item(db.Model):
+    __tablename__ = 'items'
+    id = db.Column(db.Integer, primary_key=True)
+    order_id = db.Column(db.Integer, db.ForeignKey('orders.id'), index=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('products.id'),
+                           index=True)
+    quantity = db.Column(db.Integer)
+
+    def get_url(self):
+        return url_for('api.get_item', id=self.id, _external=True)
+
+    def export_data(self):
+        return {
+            'self_url': self.get_url(),
+            'order_url': self.order.get_url(),
+            'product_url': self.product.get_url(),
+            'quantity': self.quantity
+        }
+
+    def import_data(self, data):
+        try:
+            endpoint, args = split_url(data['product_url'])
+            self.quantity = int(data['quantity'])
+        except KeyError as e:
+            raise ValidationError('Invalid order: missing ' + e.args[0])
+        if endpoint != 'api.get_product' or not 'id' in args:
+            raise ValidationError('Invalid product URL: ' +
+                                  data['product_url'])
+        self.product = Product.query.get(args['id'])
+        if self.product is None:
+            raise ValidationError('Invalid product URL: ' +
+                                  data['product_url'])
+        return self

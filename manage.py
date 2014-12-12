@@ -7,8 +7,11 @@ from blogapp.models import BlogPost
 from config import *
 
 #Create the app from the configuration outlined in config.py; the default which is being used is developmental
+#commenting out this one because there is a version below
 app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 
+#with app.app_context():
+#   db.create_all()
 
 #SET UP LOGGING HERE
 
@@ -117,5 +120,5 @@ manager.add_command('db', MigrateCommand)
 
 if __name__ == '__main__':
 
-    #manager.run()
-    app.run()
+    manager.run()
+    #app.run()

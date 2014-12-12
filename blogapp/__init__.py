@@ -1,10 +1,9 @@
-from flask import Flask
+from flask import Flask, jsonify, g
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
 from flask.ext.moment import Moment
 from flask.ext.pagedown import PageDown
-from config import config
 from flask.ext.mail import Mail
 from config import *
 #from flask.ext.babel import Babel
@@ -22,6 +21,7 @@ moment = Moment()
 pagedown = PageDown()
 
 bootstrap = Bootstrap()
+
 
 #babel = Babel()
 
@@ -62,6 +62,8 @@ def create_app(config_name):
 
     from .errors import errors as errors_blueprint
     app.register_blueprint(errors_blueprint, url_prefix='/error')
+
+
 
     return app
 
