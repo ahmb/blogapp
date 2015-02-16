@@ -18,7 +18,10 @@ from exceptions import ValidationError
 
 Base = declarative_base()
 
-
+''' Note that we are not declaring this table as a model like we did for users and posts. Since this is an auxiliary
+table that has no data other than the foreign keys, we use the lower level APIs in flask-sqlalchemy to create the table
+ without an associated model.
+'''
 followers = db.Table('followers',
     db.Column('follower_id', db.Integer, db.ForeignKey('users.id')),
     db.Column('followed_id', db.Integer, db.ForeignKey('users.id'))
@@ -103,6 +106,7 @@ class User(UserMixin, db.Model):
         s = Serializer(current_app.config['SECRET_KEY'])
         try:
             data = s.loads(token)
+        #exceptions raised by loads
         except SignatureExpired:
             return None
             # valid token, but expired
