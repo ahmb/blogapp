@@ -77,7 +77,7 @@ config = {
 
 
 # administrator list
-ADMINS = ['raufguy@gmail.com']
+ADMINS = ['xyz@gmail.com'] #change this to your email
 
 
 # -*- coding: utf-8 -*-
